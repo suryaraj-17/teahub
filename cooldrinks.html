@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="cooldrinks.css">
 </head>
 
@@ -33,8 +35,9 @@
                     </ul>
                     <form class="d-flex align-items-center">
                         <button class="btn btn-outline-success me-3" type="submit">Cart</button>
-                        <button class="btn btn-outline-success me-3" type="submit">Profile</button>
-                        <a href="register.html" class="btn btn-outline-success">Sign in</a>
+                        <button class="btn btn-outline-success me-3" id="profile" type="button">Profile</button>
+                        <button class="btn btn-outline-success me-3" id="login" type="button">Log in</button>
+                        <button class="btn btn-outline-success me-3" type="submit" id="logout">Log out</button>
                     </form>
                 </div>
             </div>
@@ -205,10 +208,42 @@
                 updateQuantity(button, false);
             });
         });
-    </script>
+        const loginButton = document.getElementById('login');
+        const logoutButton = document.getElementById('logout');
+        const welcomeMessage = document.getElementById('welcome');
+        const profileButton = document.getElementById('profile');
+        // Update UI based on login status
+        function updateLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('username');
+            if (isLoggedIn) {
+                loginButton.style.display = 'none'; // Hide login button
+                logoutButton.style.display = 'block'; // Show logout button
+            } else {
+                loginButton.style.display = 'block'; // Show login button
+                logoutButton.style.display = 'none'; // Hide logout button
+            }
+        }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        // Event listeners for login and logout
+        loginButton.addEventListener('click', () => {
+            window.location.href = "./login.html";
+        });
+
+        logoutButton.addEventListener('click', () => {
+            // Clear session storage and update UI
+            sessionStorage.removeItem('username');
+            alert('You have successfully logged out.');
+            updateLoginStatus(); // Update UI after logout
+        });
+
+        // Initialize UI on page load
+        document.addEventListener('DOMContentLoaded', updateLoginStatus);
+
+        // Profile button to redirect to profile page
+        profileButton.addEventListener('click', () => {
+            window.location.href = "./profile.html";
+        });
+    </script>
 </body>
 
 </html>

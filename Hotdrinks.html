@@ -37,8 +37,9 @@
                     </ul>
                     <form class="d-flex align-items-center">
                         <button class="btn btn-outline-success me-3" type="submit">Cart</button>
-                        <button class="btn btn-outline-success me-3" type="submit">Profile</button>
-                        <a href="register.html" class="btn btn-outline-success">Sign in</a>
+                        <button class="btn btn-outline-success me-3" id="profile" type="button">Profile</button>
+                        <button class="btn btn-outline-success me-3" id="login" type="button">Log in</button>
+                        <button class="btn btn-outline-success me-3" type="submit" id="logout">Log out</button>
                     </form>
                 </div>
             </div>
@@ -151,6 +152,11 @@
     </footer>
 
     <script>
+        const loginButton = document.getElementById('login');
+        const logoutButton = document.getElementById('logout');
+        const welcomeMessage = document.getElementById('welcome');
+        const profileButton = document.getElementById('profile');
+
         // Function to update quantity and calculate total price
         function updateQuantity(button, isIncreasing, priceElement, totalElement) {
             const quantitySpan = button.closest('.quantity-control').querySelector('.quantity');
@@ -199,8 +205,37 @@
                 updateQuantity(button, false, priceElement, totalElement);
             });
         });
+        // Update UI based on login status
+        function updateLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('username');
+            if (isLoggedIn) {
+                loginButton.style.display = 'none'; // Hide login button
+                logoutButton.style.display = 'block'; // Show logout button
+            } else {
+                loginButton.style.display = 'block'; // Show login button
+                logoutButton.style.display = 'none'; // Hide logout button
+            }
+        }
 
+        // Event listeners for login and logout
+        loginButton.addEventListener('click', () => {
+            window.location.href = "./login.html";
+        });
 
+        logoutButton.addEventListener('click', () => {
+            // Clear session storage and update UI
+            sessionStorage.removeItem('username');
+            alert('You have successfully logged out.');
+            updateLoginStatus(); // Update UI after logout
+        });
+
+        // Initialize UI on page load
+        document.addEventListener('DOMContentLoaded', updateLoginStatus);
+
+        // Profile button to redirect to profile page
+        profileButton.addEventListener('click', () => {
+            window.location.href = "./profile.html";
+        });
     </script>
 </body>
 
