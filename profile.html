@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="icon" type="image/jpeg" href="teaa.jpeg">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+    <div class="container">
+        <form id="form">
+            <div class="profile">
+                <h2>Your Profile</h2>
+            </div>
+            <div class="input-control">
+                <label for="username" class="label">Username</label>
+                <input type="text" id="username" placeholder="Enter your name" disabled>
+            </div>
+            <div class="input-control">
+                <label for="email" class="label">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" disabled>
+            </div>
+            <div class="input-control">
+                <label for="password" class="label">Old Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Old password" disabled>
+                    <span class="eye-icon" id="toggle-old-password">&#128065;</span>
+                </div>
+            </div>
+            <div class="input-control">
+                <label for="newpassword" class="label">New Password</label>
+                <div class="password-container">
+                    <input type="password" id="newpassword" placeholder="Enter your new password">
+                    <span class="eye-icon" id="toggle-new-password">&#128065;</span>
+                </div>
+            </div>
+            <div class="input-control">
+                <label for="phonenumber" class="label">Mobile Number</label>
+                <input type="text" id="phonenumber" placeholder="Enter your phone number">
+            </div>
+            <div class="update">
+                <button type="submit" id="update-btn">Update</button>
+            </div>
+            <div class="cancel">
+                <button type="button" id="cancel-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Fetch Data from Session Storage
+        const fetchDataFromSessionStorage = () => {
+            const storedData = {
+                username: sessionStorage.getItem('username') || '',
+                email: sessionStorage.getItem('email') || '',
+                oldPassword: sessionStorage.getItem('password') || '', // Correct key for old password
+                phoneNumber: sessionStorage.getItem('phoneNumber') || '',
+                userId: sessionStorage.getItem('userId') || null
+            };
+
+            if (!storedData.userId) {
+                alert("Please log in to view your profile.");
+                window.location.href = '/login.html';
+                return null;
+            }
+
+            return storedData;
+        };
+
+        // Populate Form with Session Storage Data
+        const populateForm = () => {
+            const data = fetchDataFromSessionStorage();
+            if (!data) return;
+
+            document.getElementById('username').value = data.username;
+            document.getElementById('email').value = data.email;
+            document.getElementById('password').value = data.oldPassword; // Use correct oldPassword
+            document.getElementById('phonenumber').value = data.phoneNumber;
+        };
+
+        // Validate Inputs
+        const validateInputs = () => {
+            const newPassword = document.getElementById('newpassword').value.trim();
+            const phoneNumber = document.getElementById('phonenumber').value.trim();
+            const oldPassword = document.getElementById('password').value; // Get old password from the form field
+
+            if (newPassword === oldPassword) {
+                alert('New password cannot be the same as the old password.');
+                return false;
+            }
+
+            if (newPassword.length < 8) {
+                alert('New password must be at least 8 characters long.');
+                return false;
+            }
+
+            if (!/^\d{10}$/.test(phoneNumber)) {
+                alert('Mobile number must be exactly 10 digits.');
+                return false;
+            }
+
+            return true;
+        };
+
+        // Update Profile
+        const updateProfile = () => {
+            const userId = sessionStorage.getItem('userId');
+            const apiUrl = "https://retoolapi.dev/loRUjY/chaiUser";
+            const requestBody = {
+                userName: document.getElementById('username').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('newpassword').value.trim(),
+                phoneNumber: document.getElementById('phonenumber').value.trim()
+            };
+
+            fetch(`${apiUrl}/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    alert('Profile updated successfully!');
+                    sessionStorage.setItem('password', requestBody.password); // Update session storage with new password
+                    sessionStorage.setItem('phoneNumber', requestBody.phoneNumber);
+                })
+                .catch(error => {
+                    console.error('Error during update:', error);
+                    alert('Failed to update profile. Please try again.');
+                });
+        };
+
+        // Toggle Password Visibility
+        const togglePasswordVisibility = (inputId, toggleId) => {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            toggle.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.innerHTML = '&#128586;';
+                } else {
+                    input.type = 'password';
+                    toggle.innerHTML = '&#128065;';
+                }
+            });
+        };
+
+        // Initialize
+        document.getElementById('form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (validateInputs()) {
+                updateProfile();
+            }
+        });
+
+        document.getElementById('cancel-btn').addEventListener('click', () => {
+            window.location.reload();
+        });
+
+        togglePasswordVisibility('password', 'toggle-old-password');
+        togglePasswordVisibility('newpassword', 'toggle-new-password');
+        populateForm();
+
+    </script>
+</body>
+
+</html>
