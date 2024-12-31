@@ -152,16 +152,11 @@
     </footer>
 
     <script>
-        const loginButton = document.getElementById('login');
-        const logoutButton = document.getElementById('logout');
-        const welcomeMessage = document.getElementById('welcome');
-        const profileButton = document.getElementById('profile');
-
         // Function to update quantity and calculate total price
         function updateQuantity(button, isIncreasing, priceElement, totalElement) {
             const quantitySpan = button.closest('.quantity-control').querySelector('.quantity');
             let quantity = parseInt(quantitySpan.textContent);
-
+    
             if (isIncreasing) {
                 if (quantity < 5) {
                     quantity += 1;
@@ -171,24 +166,24 @@
                     quantity -= 1;
                 }
             }
-
+    
             quantitySpan.textContent = quantity;
-
+    
             // Get the price and remove the '₹' symbol
             const price = parseInt(priceElement.textContent.replace(/[^\d]/g, '')); // Removes non-numeric characters
-
+    
             // Calculate total price
             const total = quantity * price;
             totalElement.textContent = total;
-
+    
             // Manage button states
             const plusButton = button.closest('.quantity-control').querySelector('.plus');
             const minusButton = button.closest('.quantity-control').querySelector('.minus');
-
+    
             plusButton.disabled = quantity >= 5; // Disable '+' button if quantity reaches 5
             minusButton.disabled = quantity === 0; // Disable '-' button if quantity is 0
         }
-
+    
         // Add event listeners for plus and minus buttons
         document.querySelectorAll('.plus').forEach(button => {
             button.addEventListener('click', () => {
@@ -197,7 +192,7 @@
                 updateQuantity(button, true, priceElement, totalElement);
             });
         });
-
+    
         document.querySelectorAll('.minus').forEach(button => {
             button.addEventListener('click', () => {
                 const priceElement = button.closest('.card-body').querySelector('.card-text');
@@ -205,6 +200,11 @@
                 updateQuantity(button, false, priceElement, totalElement);
             });
         });
+    
+        const loginButton = document.getElementById('login');
+        const logoutButton = document.getElementById('logout');
+        const profileButton = document.getElementById('profile');
+    
         // Update UI based on login status
         function updateLoginStatus() {
             const isLoggedIn = sessionStorage.getItem('username');
@@ -216,22 +216,41 @@
                 logoutButton.style.display = 'none'; // Hide logout button
             }
         }
-
+    
+        // Redirect to login page if not logged in
+        function checkLoginStatus() {
+            if (!sessionStorage.getItem('username')) {
+                alert('You must be logged in to access this page.');
+                window.location.href = "./login.html";
+            }
+        }
+    
+        // Redirect to login page after logout timeout
+        function logoutRedirect() {
+            setTimeout(() => {
+                window.location.href = "./login.html";
+            }, 60000); // 1 minute
+        }
+    
         // Event listeners for login and logout
         loginButton.addEventListener('click', () => {
             window.location.href = "./login.html";
         });
-
+    
         logoutButton.addEventListener('click', () => {
             // Clear session storage and update UI
             sessionStorage.removeItem('username');
             alert('You have successfully logged out.');
             updateLoginStatus(); // Update UI after logout
+            logoutRedirect(); // Redirect after timeout
         });
-
+    
         // Initialize UI on page load
-        document.addEventListener('DOMContentLoaded', updateLoginStatus);
-
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus(); // Ensure user is logged in
+            updateLoginStatus();
+        });
+    
         // Profile button to redirect to profile page
         profileButton.addEventListener('click', () => {
             window.location.href = "./profile.html";
